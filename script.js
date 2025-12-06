@@ -39,3 +39,29 @@ stopAutoBtn: $('#stop-auto'),
 status: $('#status'),
 intervalInput: $('#interval-ms')
 };
+// -------------------------
+// Config
+// -------------------------
+const API_URL = 'https://api.quotable.io/random';
+const DEFAULT_INTERVAL_MS = 8000;
+const FETCH_TIMEOUT_MS = 7000; // abort fetch after 7s
+
+
+// -------------------------
+// State
+// -------------------------
+let autoTimer = null;
+let isAuto = false;
+let cache = new Map(); // simple in-memory cache keyed by quote id
+let currentAbort = null;
+
+
+// -------------------------
+// Utilities
+// -------------------------
+function setStatus(msg, isError = false) {
+if (!DOM.status) return;
+DOM.status.textContent = msg;
+DOM.status.style.opacity = msg ? '1' : '0.6';
+DOM.status.style.color = isError ? 'crimson' : '';
+}
