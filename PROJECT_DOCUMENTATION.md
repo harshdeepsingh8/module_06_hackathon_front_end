@@ -30,15 +30,20 @@ The purpose is to demonstrate how to **set**, **get**, and **remove** data from 
 ---
 
 ### Jaskarandeep:
-*(To be completed by Jaskarandeep)*  
--   
--   
+
+-   The *** script.js *** file powers the Async Quote Generator by handling all user interactions in which script has been edited , API requests, theme switching, and automated quote updates.
+-   It uses the Quotable API to fetch random inspirational quotes with built-in error handling, abort control, and timeout protection. 
+-   The script also includes a simple cache to display the last known quote during network failures.
+-   Auto mode allows quotes to refresh at a user-defined interval, and the theme system lets users switch between light, dark, and red UI themes.
+-   Event listeners manage all button actions, while DOM helper functions keep the code modular and readable. 
+-   Overall, this script ensures smooth functionality, responsive updates, and a clean user experience.
+
 
 ---
 
 ### Harshdeep:
 
-- Implemented all JavaScript logic in **script.js** for handling client-side storage.  
+- Implemented all JavaScript logic in **style.css** for handling client-side storage.  
 - Added full functionality for saving, loading, and clearing the user's name using `localStorage`.  
 - Implemented theme switching system (light, dark, red) with persistent storage.  
 - Created the notes feature: add notes, render notes, delete individual notes, and clear all notes using `localStorage`.  
