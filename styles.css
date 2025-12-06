@@ -58,3 +58,41 @@ body[data-theme="light"] .card {
 .card h2 {
     margin-bottom: 0.5rem;
 }
+/* ======================================
+   Inputs & Buttons - Part 2
+   ====================================== */
+
+input,
+textarea {
+    width: 100%;
+    padding: 0.7rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: 0.2s ease;
+    background: var(--primary-light);
+    color: white;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.theme-btn[data-theme="light"] {
+    background: var(--primary-light);
+}
+
