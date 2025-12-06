@@ -1,133 +1,133 @@
-/*
-Async Quote Generator — script.js
-Features:
-- Manual fetch of inspirational quotes
-- Auto mode (interval)
-- Stop auto mode
-- Simple in-memory cache
-- Abort controller + timeout
-- Error handling and UI updates
+// DOM helpers
+const $ = (sel) => document.querySelector(sel);
 
-
-Also included below (in comments) are 5 staged git commits with exact commands you can run locally.
-*/
-
-
-// -------------------------
-// DOM helpers & selectors
-// -------------------------
-const $ = (sel, root = document) => root.querySelector(sel);
-const $all = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-
-
-// Expected DOM structure (minimal):
-// - #quote-text (for quote)
-// - #quote-author (for author)
-// - #fetch-quote (button)
-// - #auto-toggle (button)
-// - #stop-auto (button)
-// - #status (small status text)
-// - optional: <input id="interval-ms"> for auto interval
-
-
+// Elements
 const DOM = {
-quoteText: $('#quote-text'),
-quoteAuthor: $('#quote-author'),
-fetchBtn: $('#fetch-quote'),
-autoToggleBtn: $('#auto-toggle'),
-stopAutoBtn: $('#stop-auto'),
-status: $('#status'),
-intervalInput: $('#interval-ms')
+  quoteText: $('#quote-text'),
+  quoteAuthor: $('#quote-author'),
+  fetchBtn: $('#fetch-quote'),
+  autoToggleBtn: $('#auto-toggle'),
+  stopAutoBtn: $('#stop-auto'),
+  status: $('#status'),
+  intervalInput: $('#interval-ms'),
+  themeButtons: document.querySelectorAll('.theme-btn')
 };
-// -------------------------
+
 // Config
-// -------------------------
-const API_URL = 'https://api.quotable.io/random';
+const API_URL = "https://api.quotable.io/random";
 const DEFAULT_INTERVAL_MS = 8000;
-const FETCH_TIMEOUT_MS = 7000; // abort fetch after 7s
+const FETCH_TIMEOUT_MS = 7000;
 
-
-// -------------------------
 // State
-// -------------------------
 let autoTimer = null;
 let isAuto = false;
-let cache = new Map(); // simple in-memory cache keyed by quote id
+let cache = new Map();
 let currentAbort = null;
 
-
-// -------------------------
-// Utilities
-// -------------------------
+// Status display
 function setStatus(msg, isError = false) {
-if (!DOM.status) return;
-DOM.status.textContent = msg;
-DOM.status.style.opacity = msg ? '1' : '0.6';
-DOM.status.style.color = isError ? 'crimson' : '';
+  DOM.status.textContent = msg;
+  DOM.status.style.color = isError ? "crimson" : "";
 }
+
+// Render quote
 function renderQuote({ content, author }) {
-if (DOM.quoteText) DOM.quoteText.textContent = content;
-if (DOM.quoteAuthor) DOM.quoteAuthor.textContent = author ? `— ${author}` : '— Unknown';
+  DOM.quoteText.textContent = content;
+  DOM.quoteAuthor.textContent = author ? `— ${author}` : "— Unknown";
 }
 
+// Fetch with timeout and abort
+async function fetchWithTimeout(url) {
+  if (currentAbort) currentAbort.abort();
 
-function formatTime(ms) {
-return `${Math.round(ms / 1000)}s`;
+  const controller = new AbortController();
+  currentAbort = controller;
+
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    return await response.json();
+  } catch (err) {
+    clearTimeout(timeout);
+    throw err;
+  }
 }
 
+// Fetch quote
+async function getQuote() {
+  setStatus("Loading...");
+  try {
+    const data = await fetchWithTimeout(API_URL);
 
-// -------------------------
-// Fetch with timeout & abort
-// -------------------------
-async function fetchWithTimeout(url, opts = {}) {
-if (currentAbort) {
-// Clean up previous controller if any
-try { currentAbort.abort(); } catch (e) { /* noop */ }
-currentAbort = null;
+    cache.set(data._id, data);
+    renderQuote({ content: data.content, author: data.author });
+
+    setStatus("Loaded ✓");
+  } catch (err) {
+    setStatus("Error: " + err.message, true);
+
+    if (cache.size > 0) {
+      const first = cache.values().next().value;
+      renderQuote(first);
+      setStatus("Showing cached quote");
+    }
+  }
 }
 
-
-const controller = new AbortController();
-currentAbort = controller;
-const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-
-try {
-const res = await fetch(url, { ...opts, signal: controller.signal });
-clearTimeout(timeoutId);
-if (!res.ok) throw new Error(`HTTP ${res.status}`);
-const data = await res.json();
-return data;
-} catch (err) {
-clearTimeout(timeoutId);
-if (err.name === 'AbortError') throw new Error('Request timed out');
-throw err;
-} finally {
-currentAbort = null;
+// Auto mode
+function getIntervalMs() {
+  const val = Number(DOM.intervalInput.value);
+  return val >= 1000 ? val : DEFAULT_INTERVAL_MS;
 }
-}
-unction wireEvents() {
-if (DOM.fetchBtn) DOM.fetchBtn.addEventListener('click', () => getQuote());
-if (DOM.autoToggleBtn) DOM.autoToggleBtn.addEventListener('click', toggleAuto);
-if (DOM.stopAutoBtn) DOM.stopAutoBtn.addEventListener('click', stopAuto);
 
+function startAuto() {
+  if (isAuto) return;
+  isAuto = true;
 
-// keyboard shortcut: space to fetch, a to toggle auto, s to stop
-window.addEventListener('keydown', (e) => {
-if (e.code === 'Space') {
-e.preventDefault();
-getQuote();
+  const interval = getIntervalMs();
+  setStatus(`Auto mode running every ${interval / 1000}s`);
+
+  getQuote();
+  autoTimer = setInterval(getQuote, interval);
+  updateAutoButtons();
 }
-if (e.key === 'a') toggleAuto();
-if (e.key === 's') stopAuto();
+
+function stopAuto() {
+  isAuto = false;
+  clearInterval(autoTimer);
+  autoTimer = null;
+
+  setStatus("Auto stopped");
+  updateAutoButtons();
+}
+
+function toggleAuto() {
+  isAuto ? stopAuto() : startAuto();
+}
+
+function updateAutoButtons() {
+  DOM.autoToggleBtn.textContent = isAuto ? "Pause Auto" : "Start Auto";
+  DOM.stopAutoBtn.disabled = !isAuto;
+}
+
+// Theme switching
+DOM.themeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const theme = btn.getAttribute("data-theme");
+    document.body.setAttribute("data-theme", theme);
+  });
 });
-}
 
+// Event listeners
+DOM.fetchBtn.addEventListener("click", getQuote);
+DOM.autoToggleBtn.addEventListener("click", toggleAuto);
+DOM.stopAutoBtn.addEventListener("click", stopAuto);
 
-// -------------------------
-// Initialization
-// -------------------------
-function init() {
-wireEvents();
+// Init
+getQuote();
 updateAutoButtons();
-// try to render a cached quote if present
