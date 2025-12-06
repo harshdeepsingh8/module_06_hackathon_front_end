@@ -23,9 +23,12 @@ The purpose is to demonstrate how to **set**, **get**, and **remove** data from 
 ## Member Contributions:
 
 ### Kamaldeep:
-*(To be completed by Kamaldeep)*  
--   
--   
+- Designed and created the complete **index.html** file for the project.
+- Structured the webpage using semantic HTML elements for better readability and accessibility.
+- Built the user interface layout for theme selection, quote display, user input, and control buttons.
+- Ensured correct element IDs and data attributes so JavaScript files could integrate smoothly.
+- Focused on clean layout, responsiveness, and clear user interaction flow without adding JavaScript logic.
+
 
 ---
 
