@@ -65,3 +65,23 @@ DOM.status.textContent = msg;
 DOM.status.style.opacity = msg ? '1' : '0.6';
 DOM.status.style.color = isError ? 'crimson' : '';
 }
+function renderQuote({ content, author }) {
+if (DOM.quoteText) DOM.quoteText.textContent = content;
+if (DOM.quoteAuthor) DOM.quoteAuthor.textContent = author ? `— ${author}` : '— Unknown';
+}
+
+
+function formatTime(ms) {
+return `${Math.round(ms / 1000)}s`;
+}
+
+
+// -------------------------
+// Fetch with timeout & abort
+// -------------------------
+async function fetchWithTimeout(url, opts = {}) {
+if (currentAbort) {
+// Clean up previous controller if any
+try { currentAbort.abort(); } catch (e) { /* noop */ }
+currentAbort = null;
+}
