@@ -106,3 +106,28 @@ throw err;
 currentAbort = null;
 }
 }
+unction wireEvents() {
+if (DOM.fetchBtn) DOM.fetchBtn.addEventListener('click', () => getQuote());
+if (DOM.autoToggleBtn) DOM.autoToggleBtn.addEventListener('click', toggleAuto);
+if (DOM.stopAutoBtn) DOM.stopAutoBtn.addEventListener('click', stopAuto);
+
+
+// keyboard shortcut: space to fetch, a to toggle auto, s to stop
+window.addEventListener('keydown', (e) => {
+if (e.code === 'Space') {
+e.preventDefault();
+getQuote();
+}
+if (e.key === 'a') toggleAuto();
+if (e.key === 's') stopAuto();
+});
+}
+
+
+// -------------------------
+// Initialization
+// -------------------------
+function init() {
+wireEvents();
+updateAutoButtons();
+// try to render a cached quote if present
