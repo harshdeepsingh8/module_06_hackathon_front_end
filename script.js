@@ -85,3 +85,24 @@ if (currentAbort) {
 try { currentAbort.abort(); } catch (e) { /* noop */ }
 currentAbort = null;
 }
+
+
+const controller = new AbortController();
+currentAbort = controller;
+const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+
+try {
+const res = await fetch(url, { ...opts, signal: controller.signal });
+clearTimeout(timeoutId);
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+const data = await res.json();
+return data;
+} catch (err) {
+clearTimeout(timeoutId);
+if (err.name === 'AbortError') throw new Error('Request timed out');
+throw err;
+} finally {
+currentAbort = null;
+}
+}
