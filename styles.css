@@ -95,4 +95,83 @@ button:hover {
 .theme-btn[data-theme="light"] {
     background: var(--primary-light);
 }
+/* ======================================
+   Themes + Notes Section - Part 3
+   ====================================== */
 
+/* Dark Theme */
+:root {
+    --bg-dark: #1e1e1e;
+    --card-dark: #2c2c2c;
+    --text-dark: #f1f1f1;
+    --primary-dark: #8ab4ff;
+}
+
+body[data-theme="dark"] {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+body[data-theme="dark"] .card {
+    background: var(--card-dark);
+    border: 1px solid #444;
+}
+
+/* Red Theme */
+:root {
+    --bg-red: #2a0000;
+    --card-red: #3c0000;
+    --text-red: #ffe5e5;
+    --primary-red: #ff4d4d;
+}
+
+body[data-theme="red"] {
+    background-color: var(--bg-red);
+    color: var(--text-red);
+}
+
+body[data-theme="red"] .card {
+    background: var(--card-red);
+    border: 1px solid #660000;
+}
+
+/* Theme buttons */
+.theme-btn[data-theme="dark"] {
+    background: var(--primary-dark);
+}
+
+.theme-btn[data-theme="red"] {
+    background: var(--primary-red);
+}
+
+/* Notes list */
+#notes-list {
+    list-style: none;
+    margin-top: 1rem;
+}
+
+.note-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
+    padding: 0.7rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.6rem;
+}
+
+.delete-note-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-note-btn:hover {
+    background: #b91c1c;
+}
+
+body[data-theme="red"] .delete-note-btn {
+    background: #ff6666;
+}
+body[data-theme="red"] .delete-note-btn:hover {
+    background: #cc3333;
+}
